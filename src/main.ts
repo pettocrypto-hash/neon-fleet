@@ -10,6 +10,7 @@ import { loadSave, resumeSave } from './app/game-session';
 import { settings } from './app/settings';
 import { setLanguage } from './i18n';
 import { normalizeRoomCode } from './net/transport';
+import { applyTheme } from './render/theme';
 import { App } from './ui/app';
 import { gameScreen } from './ui/game-screen';
 import { lobbyScreen } from './ui/lobby';
@@ -17,6 +18,7 @@ import { joinScreen, startScreen } from './ui/menus';
 
 setLanguage(settings.lang);
 document.documentElement.dataset.quality = settings.quality;
+applyTheme(settings.theme);
 
 // Echte Viewport-Höhe (mobile Browserleisten) als CSS-Variable.
 const setVh = () => document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);

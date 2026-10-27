@@ -5,6 +5,7 @@ import { settings, updateSettings, type Quality } from '../app/settings';
 import type { GameMode } from '../config/balance';
 import { t, type I18nKey } from '../i18n';
 import { normalizeRoomCode } from '../net/transport';
+import { applyTheme, type ThemeId } from '../render/theme';
 import type { App, Screen } from './app';
 import { button, glitchTitle, h, segmented, toast } from './dom';
 import { gameScreen } from './game-screen';
@@ -245,6 +246,22 @@ export function settingsScreen(app: App): Screen {
         { class: 'field' },
         h('label', null, t('settings.mute')),
         segmented<string>([{ value: 'off', label: t('settings.off') }, { value: 'on', label: t('settings.on') }], settings.muted ? 'on' : 'off', (v) => updateSettings({ muted: v === 'on' })),
+      ),
+      h(
+        'div',
+        { class: 'field' },
+        h('label', null, t('settings.theme')),
+        segmented<ThemeId>(
+          [
+            { value: 'neon', label: t('settings.theme.neon') },
+            { value: 'light', label: t('settings.theme.light') },
+          ],
+          settings.theme,
+          (v) => {
+            updateSettings({ theme: v });
+            applyTheme(v);
+          },
+        ),
       ),
       h(
         'div',

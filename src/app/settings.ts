@@ -1,5 +1,6 @@
 import { BALANCE, type GameMode } from '../config/balance';
 import type { Difficulty } from '../ai/ai';
+import type { ThemeId } from '../render/theme';
 
 export type Quality = 'low' | 'medium' | 'high';
 
@@ -9,6 +10,7 @@ export interface Settings {
   sfx: number;
   muted: boolean;
   quality: Quality;
+  theme: ThemeId;
   vibrate: boolean;
   turnSeconds: number;
   mode: GameMode;
@@ -26,6 +28,7 @@ function defaults(): Settings {
     sfx: 0.6,
     muted: false,
     quality: lowEnd ? 'medium' : 'high',
+    theme: 'neon',
     vibrate: true,
     turnSeconds: BALANCE.timers.turnSeconds,
     mode: 'cyber',

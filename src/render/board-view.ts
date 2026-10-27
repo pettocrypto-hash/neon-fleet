@@ -322,8 +322,8 @@ export class BoardView {
     const tint = this.tint;
     // Panel
     const g = ctx.createLinearGradient(0, 0, N, N);
-    g.addColorStop(0, 'rgba(18, 6, 42, 0.88)');
-    g.addColorStop(1, 'rgba(6, 2, 18, 0.92)');
+    g.addColorStop(0, C.panel0);
+    g.addColorStop(1, C.panel1);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, N, N);
 
@@ -361,7 +361,7 @@ export class BoardView {
     if (this.s > 14) for (let y = 1; y < N; y++) for (let x = 1; x < N; x++) ctx.fillRect(x - px, y - px, 2 * px, 2 * px);
     // Rahmen mit Glow
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     ctx.strokeStyle = rgba(tint, 0.18);
     ctx.lineWidth = 6 * px;
     ctx.strokeRect(0, 0, N, N);

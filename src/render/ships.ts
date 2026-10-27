@@ -62,7 +62,7 @@ export function drawShip(
       ctx.restore();
     }
     // Riss-Glühen
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     ctx.strokeStyle = rgba(C.orange, 0.8 * (1 - breakT * 0.6));
     ctx.lineWidth = 0.05;
     ctx.beginPath();
@@ -80,7 +80,7 @@ export function drawShip(
 
   // Treffer: glühende Segmente
   if (o.hits) {
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     for (let i = 0; i < o.hits.length; i++) {
       if (!o.hits[i]) continue;
       const flick = 0.65 + 0.35 * Math.sin(now / 90 + i * 2.1) * Math.sin(now / 37 + i);
@@ -224,7 +224,7 @@ function paintHull(ctx: CanvasRenderingContext2D, kind: ShipKind, _len: number, 
   poly(ctx, shape);
   const grad = ctx.createLinearGradient(0, -0.45, 0, 0.45);
   grad.addColorStop(0, rgba(color, wreck ? 0.12 : 0.22));
-  grad.addColorStop(0.5, wreck ? 'rgba(20,4,10,0.9)' : 'rgba(6,14,30,0.92)');
+  grad.addColorStop(0.5, wreck ? C.wreckHull : C.hull);
   grad.addColorStop(1, rgba(color, wreck ? 0.1 : 0.18));
   ctx.fillStyle = grad;
   ctx.fill();
@@ -232,7 +232,7 @@ function paintHull(ctx: CanvasRenderingContext2D, kind: ShipKind, _len: number, 
   // Neon-Kontur: breiter weicher Schein + scharfe Linie
   if (glow > 0) {
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     ctx.strokeStyle = rgba(color, wreck ? 0.12 : 0.22 * glow);
     ctx.lineWidth = lw * 4;
     ctx.stroke();
@@ -320,7 +320,7 @@ function paintEngines(ctx: CanvasRenderingContext2D, kind: ShipKind, color: stri
   const engines: number[] =
     kind === 'dreadnought' ? [-0.24, 0, 0.24] : kind === 'carrier' ? [-0.22, 0.22] : kind === 'interceptor' ? [-0.28, 0.28] : kind === 'cruiser' ? [-0.15, 0.15] : [0];
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = C.blend;
   for (let i = 0; i < engines.length; i++) {
     const ey = engines[i];
     const flick = 0.75 + 0.25 * Math.sin(now / 45 + i * 1.7) + 0.1 * Math.sin(now / 13 + i);
@@ -349,12 +349,12 @@ function paintSkiff(ctx: CanvasRenderingContext2D, color: string, now: number, w
   ctx.arc(0, 0, 0.36, 0, Math.PI * 2);
   const g = ctx.createRadialGradient(0, 0, 0.05, 0, 0, 0.36);
   g.addColorStop(0, rgba(color, wreck ? 0.15 : 0.3));
-  g.addColorStop(1, 'rgba(6,14,30,0.92)');
+  g.addColorStop(1, C.hull);
   ctx.fillStyle = g;
   ctx.fill();
   if (glow > 0 && !wreck) {
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     ctx.strokeStyle = rgba(color, 0.22 * glow);
     ctx.lineWidth = 0.16;
     ctx.stroke();
@@ -397,7 +397,7 @@ function turret(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, 
   ctx.lineWidth = 0.03;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(4,10,22,0.9)';
+  ctx.fillStyle = C.cockpit;
   ctx.fill();
   ctx.stroke();
   ctx.lineWidth = 0.04;
@@ -409,7 +409,7 @@ function turret(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, 
 function core(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, now: number, wreck: boolean) {
   const pulse = wreck ? 0.25 : 0.7 + 0.3 * Math.sin(now / 260 + x * 3);
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = C.blend;
   const g = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
   g.addColorStop(0, rgba('#ffffff', 0.95 * pulse));
   g.addColorStop(0.3, rgba(color, 0.8 * pulse));

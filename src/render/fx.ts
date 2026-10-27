@@ -88,7 +88,7 @@ export class FxLayer {
     this.burst(x, y, big ? 16 : 7, ['#40102a', '#2a0a20'], 1, 'smoke', 1.6);
     this.anim(big ? 650 : 420, (ctx, p) => {
       const r = (big ? 1.8 : 1.1) * (1 - (1 - p) ** 3);
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = C.blend;
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
       g.addColorStop(0, rgba('#ffffff', 0.9 * (1 - p)));
       g.addColorStop(0.4, rgba(C.orange, 0.6 * (1 - p)));
@@ -107,7 +107,7 @@ export class FxLayer {
     this.anim(
       dur,
       (ctx, p) => {
-        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalCompositeOperation = C.blend;
         ctx.strokeStyle = rgba(color, 0.9 * (1 - p));
         ctx.lineWidth = 0.08 * (1 - p) + 0.015;
         ctx.beginPath();
@@ -134,7 +134,7 @@ export class FxLayer {
         const tail = Math.max(0, p * 1.6 - 0.6);
         const hx = fromX + (x - fromX) * head, hy = fromY + (y - fromY) * head;
         const tx = fromX + (x - fromX) * tail, ty = fromY + (y - fromY) * tail;
-        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalCompositeOperation = C.blend;
         ctx.lineCap = 'round';
         ctx.strokeStyle = rgba(color, 0.35);
         ctx.lineWidth = 0.22;
@@ -163,7 +163,7 @@ export class FxLayer {
         const py = sy + (y - sy) * e - Math.sin(p * Math.PI) * 2.2;
         trail.push([px, py]);
         if (trail.length > 14) trail.shift();
-        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalCompositeOperation = C.blend;
         for (let i = 1; i < trail.length; i++) {
           ctx.strokeStyle = rgba(color, (i / trail.length) * 0.6);
           ctx.lineWidth = 0.1 * (i / trail.length);
@@ -191,7 +191,7 @@ export class FxLayer {
       ctx.beginPath();
       ctx.rect(x0, y0, x1 - x0, y1 - y0);
       ctx.clip();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = C.blend;
       const a = p * Math.PI * 4;
       ctx.fillStyle = rgba(color, 0.25 * (1 - p));
       ctx.beginPath();
@@ -220,7 +220,7 @@ export class FxLayer {
     this.shockwave({ x: cx - 0.5, y: cy - 0.5 }, C.violet, 2.6, 800);
     this.shockwave({ x: cx - 0.5, y: cy - 0.5 }, C.pink, 2.0, 700, 120);
     this.anim(900, (ctx, p) => {
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = C.blend;
       ctx.strokeStyle = rgba(C.violet, 0.9 * (1 - p));
       ctx.lineWidth = 0.04;
       for (let i = 0; i < 6; i++) {
@@ -249,7 +249,7 @@ export class FxLayer {
       const fly = Math.min(1, p / 0.55);
       const e = 1 - (1 - fly) ** 3;
       const px = -1 + (x + 1) * e, py = y - 3 * (1 - e);
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = C.blend;
       ctx.strokeStyle = rgba(C.yellow, 0.9);
       ctx.lineWidth = 0.04;
       ctx.beginPath();
@@ -278,7 +278,7 @@ export class FxLayer {
   /** Schild-, Reparatur-, Hologramm-, Sprung-Effekte auf dem eigenen Feld. */
   pulseArea(cells: Cell[], color: string, dur = 900) {
     this.anim(dur, (ctx, p) => {
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = C.blend;
       ctx.fillStyle = rgba(color, 0.35 * Math.sin(p * Math.PI));
       ctx.strokeStyle = rgba(color, 0.9 * (1 - p));
       ctx.lineWidth = 0.05;
@@ -293,7 +293,7 @@ export class FxLayer {
 
   beamColumn(cells: Cell[], color: string) {
     this.anim(800, (ctx, p) => {
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = C.blend;
       for (const c of cells) {
         const g = ctx.createLinearGradient(0, c.y - 2, 0, c.y + 1);
         g.addColorStop(0, rgba(color, 0));
@@ -311,7 +311,7 @@ export class FxLayer {
       1100,
       (ctx, p) => {
         const a = p < 0.15 ? p / 0.15 : 1 - (p - 0.15) / 0.85;
-        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalCompositeOperation = C.blend;
         ctx.font = `700 0.55px ${FONT_DISPLAY}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -338,7 +338,7 @@ export class FxLayer {
     // Partikel
     if (!this.particles.length) return;
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     const alive: Particle[] = [];
     for (const p of this.particles) {
       p.life += dt;
@@ -356,7 +356,7 @@ export class FxLayer {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * (1 + p.life), 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalCompositeOperation = C.blend;
       } else {
         ctx.fillStyle = rgba(p.color, a);
         const s = p.size * (p.kind === 'spark' ? 1 : 1.2);

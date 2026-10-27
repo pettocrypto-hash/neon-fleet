@@ -37,7 +37,7 @@ function fireMark(ctx: CanvasRenderingContext2D, c: Cell, now: number, strong = 
   const x = c.x + 0.5, y = c.y + 0.5;
   const f = 0.7 + 0.3 * Math.sin(now / 80 + c.x * 1.3 + c.y) * Math.sin(now / 31 + c.y);
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = C.blend;
   const g = ctx.createRadialGradient(x, y, 0.02, x, y, 0.62);
   g.addColorStop(0, rgba('#fff4c4', (strong ? 0.9 : 0.5) * f));
   g.addColorStop(0.3, rgba(C.orange, 0.75 * f));
@@ -62,7 +62,7 @@ function mineMark(ctx: CanvasRenderingContext2D, c: Cell, now: number, exploded:
   const pulse = 0.6 + 0.4 * Math.sin(now / 200 + c.x);
   ctx.save();
   if (exploded) {
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = C.blend;
     ctx.fillStyle = rgba(C.yellow, 0.18 * pulse);
     ctx.fillRect(c.x + 0.04, c.y + 0.04, 0.92, 0.92);
   }
@@ -88,7 +88,7 @@ function signalMark(ctx: CanvasRenderingContext2D, c: Cell, now: number) {
   const x = c.x + 0.5, y = c.y + 0.5;
   const p = 0.5 + 0.5 * Math.sin(now / 220 + c.x + c.y);
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = C.blend;
   ctx.fillStyle = rgba(C.green, 0.12 + 0.12 * p);
   ctx.fillRect(c.x + 0.06, c.y + 0.06, 0.88, 0.88);
   ctx.strokeStyle = rgba(C.green, 0.9);
@@ -201,7 +201,7 @@ export function paintEnemy(ctx: CanvasRenderingContext2D, now: number, d: EnemyS
     ctx.font = `800 0.6px ${FONT_DISPLAY}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = rgba('#000', 0.6);
+    ctx.fillStyle = C.badge;
     ctx.beginPath();
     ctx.arc(cx + 0.5, cy + 0.5, 0.36, 0, Math.PI * 2);
     ctx.fill();
@@ -285,7 +285,7 @@ export function paintCrosshair(ctx: CanvasRenderingContext2D, now: number, cells
   const col = valid ? color : C.red;
   const pulse = 0.5 + 0.5 * Math.sin(now / 140);
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = C.blend;
   for (const c of cells) {
     ctx.fillStyle = rgba(col, 0.12 + 0.1 * pulse);
     ctx.fillRect(c.x, c.y, 1, 1);
