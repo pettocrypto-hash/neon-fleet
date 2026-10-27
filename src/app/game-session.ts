@@ -114,6 +114,15 @@ export function loadSave(): SaveData | null {
   }
 }
 
+/** Gehört der Spielstand zu diesem Tab (also Neuladen statt frischem App-Start)? */
+export function isTabSave(d: SaveData): boolean {
+  try {
+    return sessionStorage.getItem(TAB_KEY) === `${SAVE_PREFIX}${d.room}.${d.role}`;
+  } catch {
+    return false;
+  }
+}
+
 /** Entfernt den Spielstand dieses Tabs (neues Spiel gestartet). */
 export function clearSave() {
   try {

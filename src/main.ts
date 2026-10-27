@@ -6,7 +6,7 @@ import '@fontsource/rajdhani/latin-600.css';
 import '@fontsource/rajdhani/latin-700.css';
 import './styles.css';
 import { registerSW } from 'virtual:pwa-register';
-import { loadSave, resumeSave } from './app/game-session';
+import { isTabSave, loadSave, resumeSave } from './app/game-session';
 import { settings } from './app/settings';
 import { setLanguage } from './i18n';
 import { normalizeRoomCode } from './net/transport';
@@ -45,9 +45,10 @@ if (roomParam) history.replaceState(null, '', location.pathname);
 const room = roomParam ? normalizeRoomCode(roomParam) : null;
 const save = loadSave();
 
-// Mit Einladungslink nur als Gast fortsetzen – sonst neu beitreten.
-if (save && (!room || (room === save.room && save.role === 'guest')) && navigator.onLine) {
-  // Gleicher Raum (z. B. nach Neuladen) → Spiel direkt fortsetzen.
+// Direkt fortsetzen nur beim Neuladen desselben Tabs oder mit dem Einladungslink zum eigenen Raum.
+// Beim frischen App-Start erscheint stattdessen das Menü mit „Spiel fortsetzen“.
+const autoResume = save && navigator.onLine && (room ? room === save.room && save.role === 'guest' : isTabSave(save));
+if (save && autoResume) {
   const s = resumeSave(save);
   app.setSession(s);
   app.go(s.ctrl.phase === 'lobby' ? lobbyScreen : gameScreen);
