@@ -21,6 +21,8 @@ import { muteButton } from './menus';
 type Mode = 'shot' | SpecialId;
 
 const LAND_MS = 280;
+/** Wartezeit, bevor die Ansicht nach einem Zugwechsel umschaltet (Einschlag soll sichtbar bleiben). */
+const VIEW_SWITCH_MS = 750;
 
 /** Kampfansicht: Gegnerfeld im Fokus, eigene Flotte als Minimap, HUD und Aktionsleiste. */
 export class BattleView implements PhaseView {
@@ -43,6 +45,7 @@ export class BattleView implements PhaseView {
   private holdOwn = new Map<number, number>();
   private lastTurnActive: number | null = null;
   private lastEnergy = -1;
+  private viewTimer: ReturnType<typeof setTimeout> | null = null;
 
   // HUD-Elemente
   private roundChip = h('span', { class: 'chip' });
@@ -83,7 +86,7 @@ export class BattleView implements PhaseView {
     for (const id of SPECIAL_ORDER) {
       const b = h(
         'button',
-        { class: 'special', type: 'button', title: t(`specialDesc.${id}` as I18nKey) },
+        { class: `special ${SPECIALS[id].target === 'own' ? 'sp-own' : 'sp-enemy'}`, type: 'button', title: t(`specialDesc.${id}` as I18nKey) },
         h('span', { class: 'sp-ico', html: icon(id, 20) }),
         h('span', { class: 'sp-name' }, t(`special.${id}` as I18nKey)),
         h('span', { class: 'sp-cost' }),
@@ -135,6 +138,14 @@ export class BattleView implements PhaseView {
       h('div', { class: 'fleet-row' }, this.fleetMine, this.fleetEnemy),
       this.mainSlot,
       h('div', { class: 'info-row' }, h('div', { class: 'info-left' }, this.hint, this.ticker), this.miniSlot),
+      cyber
+        ? h(
+            'div',
+            { class: 'sp-legend' },
+            h('span', { class: 'enemy' }, h('i'), t('battle.spEnemy')),
+            h('span', { class: 'own' }, h('i'), t('battle.spOwn')),
+          )
+        : null,
       cyber ? grid : null,
       this.actionsRow,
       this.logPanel,
@@ -175,6 +186,7 @@ export class BattleView implements PhaseView {
     this.own.input = { onTap: (c) => this.tapOwn(c) };
     this.offFx = ctrl.onFx((f) => this.onFx(f));
     this.restoreSunkClocks();
+    this.syncView();
   }
 
   private restoreSunkClocks() {
@@ -185,6 +197,7 @@ export class BattleView implements PhaseView {
   }
 
   destroy() {
+    if (this.viewTimer) clearTimeout(this.viewTimer);
     this.offFx();
     this.enemy.destroy();
     this.own.destroy();
@@ -318,12 +331,39 @@ export class BattleView implements PhaseView {
     this.selShip = null;
     if (this.isOwnMode()) this.target = null;
     else if (wasOwn) this.target = null;
-    const wantEnemy = !this.isOwnMode();
-    if (wantEnemy !== this.mainIsEnemy) this.swap(false);
+    this.syncView();
     this.update();
   }
 
+  /** Setzt die Auswahl zurück, ohne die Ansicht zu wechseln. */
+  private resetMode() {
+    this.mode = 'shot';
+    this.selShip = null;
+    this.target = null;
+  }
+
+  /** Großes Raster: Feindraster, wenn ich angreife; eigene Flotte, wenn der Gegner dran ist oder ich auf meinem Feld wirke. */
+  private wantEnemyView() {
+    return this.s.ctrl.myTurn && !this.isOwnMode();
+  }
+
+  private syncView(delay = 0) {
+    if (this.viewTimer) clearTimeout(this.viewTimer);
+    this.viewTimer = null;
+    const apply = () => {
+      this.viewTimer = null;
+      if (this.wantEnemyView() !== this.mainIsEnemy) this.swap(false);
+    };
+    if (delay > 0) this.viewTimer = setTimeout(apply, delay);
+    else apply();
+  }
+
   private swap(sound = true) {
+    if (sound && this.viewTimer) {
+      // Manueller Wechsel hat Vorrang vor einem anstehenden automatischen.
+      clearTimeout(this.viewTimer);
+      this.viewTimer = null;
+    }
     this.mainIsEnemy = !this.mainIsEnemy;
     const [main, mini] = this.mainIsEnemy ? [this.enemyHost, this.ownHost] : [this.ownHost, this.enemyHost];
     this.mainSlot.insertBefore(main, this.mainTag);
@@ -413,6 +453,15 @@ export class BattleView implements PhaseView {
     let err: string | null;
     if (this.isOwnMode()) {
       err = ctrl.selfAction(this.selfRequest()!);
+      if (!err) {
+        // Effekt auf dem eigenen Feld kurz zeigen, dann zurück zum Feindraster.
+        vibrate(25);
+        this.resetMode();
+        this.own.focus = null;
+        this.syncView(VIEW_SWITCH_MS + 300);
+        this.update();
+        return;
+      }
     } else {
       const a = this.attackAction()!;
       err = ctrl.attack(a);
@@ -463,7 +512,11 @@ export class BattleView implements PhaseView {
       case 'attack': {
         const mine = f.by === ctrl.me;
         if (!mine) this.playLaunch(f.action, false);
-        if (f.result.t === 'shots') this.playOutcomes(f.result.outcomes, mine, f.action.t === 'salvo');
+        if (f.result.t === 'shots') {
+          this.playOutcomes(f.result.outcomes, mine, f.action.t === 'salvo');
+          const hit = f.result.outcomes.some((o) => o.r === 'hit' || o.r === 'sunk');
+          if (mine && hit && ctrl.myTurn && ctrl.phase === 'battle') setTimeout(() => ctrl.myTurn && this.showBanner(t('battle.again'), 'good', '', 1000), LAND_MS + 150);
+        }
         else if (f.result.t === 'radar') {
           const bv = mine ? this.enemy : this.own;
           bv.fx.text(f.action.c, `${f.result.count}`, C.green, 900);
@@ -496,8 +549,10 @@ export class BattleView implements PhaseView {
             vibrate([20, 40, 20]);
           }
         }
+        const changed = this.lastTurnActive !== f.active;
         this.lastTurnActive = f.active;
-        if (mineTurn) this.setMode('shot');
+        this.resetMode();
+        this.syncView(changed ? VIEW_SWITCH_MS : 0);
         break;
       }
       case 'event': {
@@ -714,6 +769,7 @@ export class BattleView implements PhaseView {
     this.fireBtn.disabled = !valid;
     this.fireBtn.querySelector('b')!.textContent = ctrl.busy ? t('battle.waiting') : this.mode === 'shot' ? t('battle.fire') : t('battle.confirm');
     this.fireBtn.classList.toggle('special-mode', this.mode !== 'shot');
+    this.fireBtn.classList.toggle('own-mode', this.isOwnMode());
     this.rotBtn.classList.toggle('hidden', this.mode !== 'salvo' && this.mode !== 'jump');
     this.cancelBtn.classList.toggle('hidden', this.mode === 'shot');
 
@@ -739,7 +795,7 @@ export class BattleView implements PhaseView {
     this.mainSlot.classList.toggle('enemy', this.mainIsEnemy);
     if (!myTurn) {
       this.enemy.focus = null;
-      if (!this.mainIsEnemy && this.isOwnMode()) this.setMode('shot');
+      if (this.isOwnMode()) this.resetMode();
     } else if (this.mainIsEnemy) this.enemy.focus = this.target;
 
     this.renderLog(false);

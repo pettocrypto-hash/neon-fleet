@@ -194,15 +194,23 @@ describe('Energie, Züge, Combo, Gewinn', () => {
     expect(st.energy[0]).toBe(3);
     expect(st.active).toBe(1);
   });
-  it('3 Treffer in Folge geben einen Extra-Schuss', () => {
+  it('Cyber: Treffer = nochmal, Fehlschuss beendet den Zug', () => {
     const st = createMatch('cyber', 1, 0);
-    applyAction(st, 0, shot, shots('hit'));
-    applyAction(st, 1, shot, shots('miss'));
-    applyAction(st, 0, shot, shots('hit'));
-    applyAction(st, 1, shot, shots('miss'));
     applyAction(st, 0, shot, shots('hit'));
     expect(st.active).toBe(0);
     expect(st.shotsLeft).toBe(1);
+    applyAction(st, 0, shot, shots('miss'));
+    expect(st.active).toBe(1);
+  });
+  it('3 Treffer in Folge geben einen Reserve-Schuss', () => {
+    const st = createMatch('cyber', 1, 0);
+    applyAction(st, 0, shot, shots('hit'));
+    applyAction(st, 0, shot, shots('hit'));
+    applyAction(st, 0, shot, shots('hit'));
+    expect(st.active).toBe(0);
+    expect(st.shotsLeft).toBe(2);
+    applyAction(st, 0, shot, shots('miss'));
+    expect(st.active).toBe(0);
     applyAction(st, 0, shot, shots('miss'));
     expect(st.active).toBe(1);
   });

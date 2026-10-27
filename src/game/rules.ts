@@ -131,12 +131,14 @@ export function applyAction(st: MatchState, actor: PlayerId, action: PublicActio
   const cyber = st.mode === 'cyber';
   let endNow = false;
   let bonus = 0;
+  let anyHit = false;
   for (const o of result.outcomes) {
     switch (o.r) {
       case 'hit':
       case 'sunk':
         stats.shots++;
         stats.hits++;
+        anyHit = true;
         addEnergy(st, actor, BALANCE.energy.perHit);
         if (o.r === 'sunk') {
           stats.sunk++;
@@ -149,8 +151,6 @@ export function applyAction(st: MatchState, actor: PlayerId, action: PublicActio
             bonus += BALANCE.combo.bonusShots;
             st.lastComboTurn = st.turn;
           }
-        } else if (BALANCE.classic.extraShotOnHit) {
-          bonus = 1;
         }
         break;
       case 'miss':
@@ -177,6 +177,7 @@ export function applyAction(st: MatchState, actor: PlayerId, action: PublicActio
     st.shotsLeft = 0;
     return;
   }
+  if (anyHit && BALANCE.extraShotOnHit) bonus++;
   st.shotsLeft = endNow ? 0 : st.shotsLeft - 1 + bonus;
   if (st.shotsLeft <= 0) endTurn(st);
 }

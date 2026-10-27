@@ -28,7 +28,7 @@ export const de = {
   'mode.cyber': 'Cyber',
   'mode.cyberDesc': 'Energie, Spezialwaffen, Minen, Events',
   'mode.classic': 'Klassisch',
-  'mode.classicDesc': 'Pur: Treffer = nochmal schießen',
+  'mode.classicDesc': 'Pur: nur Schüsse, keine Extras',
   'timer.label': 'Zug-Timer',
 
   'create.title': 'Raum erstellen',
@@ -106,6 +106,9 @@ export const de = {
   'battle.ownGrid': 'Eigene Flotte',
   'battle.waiting': 'Übertrage …',
   'battle.extraShot': 'Extra-Schuss!',
+  'battle.again': 'Treffer – nochmal!',
+  'battle.spEnemy': 'Gegen Gegner',
+  'battle.spOwn': 'Eigenes Feld',
   'battle.empBlocked': 'EMP – Systeme gestört',
   'battle.blackout': 'BLACKOUT',
   'battle.cancel': 'Abbrechen',
@@ -119,7 +122,7 @@ export const de = {
   'battle.tapDest': 'Ziel wählen, dann bestätigen',
   'battle.invalid': 'Hier nicht möglich',
   'battle.alreadyShot': 'Feld bereits beschossen',
-  'battle.combo': 'COMBO! +1 Schuss',
+  'battle.combo': 'COMBO! +1 Reserve-Schuss',
   'battle.minimapHint': 'Tippen: Felder tauschen',
 
   'special.salvo': 'Salve',
@@ -226,7 +229,7 @@ export const de = {
 <h3>Flotte</h3>
 <p>1× Dreadnought (6), 1× Carrier (5), 2× Cruiser (4), 2× Destroyer (3), 2× Interceptor (2), 2× Drone Skiff (1). Schiffe dürfen sich berühren.</p>
 <h3>Ablauf</h3>
-<p>Pro Zug hast du einen Schuss. Tippe ein Feld an – das Fadenkreuz springt dorthin – und bestätige mit <b>FEUER</b>. Mit zwei Fingern zoomen und verschieben.</p>
+<p>Pro Zug hast du einen Schuss – bei einem Treffer darfst du nochmal feuern. Tippe ein Feld an – das Fadenkreuz springt dorthin – und bestätige mit <b>FEUER</b>. Mit zwei Fingern zoomen und verschieben.</p>
 <h3>Energie (Cyber-Modus)</h3>
 <p>+1 pro Zug, +1 pro Treffer, +2 pro versenktem Schiff, maximal 10. Pro Zug darfst du eine Spezialaktion einsetzen – die Salve ersetzt stattdessen deinen Schuss.</p>
 <h3>Spezialaktionen</h3>
@@ -243,7 +246,7 @@ export const de = {
 <h3>Minen</h3>
 <p>Du legst 3 Minen. Trifft der Gegner eine, verliert er 2 Energie und sein Zug endet. Drohnen sehen keine Minen.</p>
 <h3>Combo & Events</h3>
-<p>3 Treffer in Folge geben einen Extra-Schuss. Alle 8 Runden tritt ein Event für beide ein: Sonnensturm, Energie-Boost, Blackout oder Überladung.</p>
+<p>3 Treffer in Folge geben zusätzlich einen Reserve-Schuss, der einen Fehlschuss verzeiht. Alle 8 Runden tritt ein Event für beide ein: Sonnensturm, Energie-Boost, Blackout oder Überladung.</p>
 <h3>Fairness</h3>
 <p>Vor dem Kampf wird ein kryptografischer Hash deiner Aufstellung gesendet. Nach Spielende decken beide auf, und jedes Ergebnis wird automatisch nachgeprüft.</p>`,
 

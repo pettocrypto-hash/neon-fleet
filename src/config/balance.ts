@@ -71,7 +71,7 @@ export const BALANCE = {
     energyPenalty: 2,
   },
   combo: {
-    /** Treffer in Folge, die einen Extra-Schuss auslösen. */
+    /** Treffer in Folge, die einen zusätzlichen Reserve-Schuss auslösen. */
     hitsForBonus: 3,
     bonusShots: 1,
   },
@@ -89,10 +89,8 @@ export const BALANCE = {
     turnSeconds: 45,
     setupSeconds: 150,
   },
-  classic: {
-    /** Klassischer Modus: Bei Treffer erneut schießen. */
-    extraShotOnHit: true,
-  },
+  /** Treffer = nochmal schießen (beide Modi, einmal pro Angriff, auch bei der Salve). */
+  extraShotOnHit: true,
 } as const;
 
 export type GameMode = 'cyber' | 'classic';
